@@ -1,0 +1,13 @@
+// Fonction de ping
+
+function ping($host, $port, $timeout) { 
+  $tB = microtime(true); 
+  $fP = fSockOpen($host, $port, $errno, $errstr, $timeout); 
+  if (!$fP) { return "OFF"; } 
+  $tA = microtime(true); 
+  return round((($tA - $tB) * 1000), 0)." cm de bite"; 
+}
+
+//On echo le "ping"
+
+echo ping("www.lowas.fr", 80, 10);
