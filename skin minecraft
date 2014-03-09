@@ -1,0 +1,44 @@
+function is404($filename){
+    $handle=curl_init($filename);
+    curl_setopt($handle,CURLOPT_RETURNTRANSFER,true);
+    $response=curl_exec($handle);
+    $httpCode=curl_getinfo($handle,CURLINFO_HTTP_CODE);
+    curl_close($handle);
+    if($httpCode>=200&&$httpCode<300){return false;}
+	else{return true;}
+}
+
+if(!empty($_GET['pseudo'])) {
+	$pseudo = trim($_GET['pseudo']);
+} else {
+	$pseudo = "char.png";
+}
+
+
+if(!empty($_GET['size'])) {
+	$size = $_GET['size'];
+} else {
+	$size = "64";
+}
+
+$filename = 'http://s3.amazonaws.com/MinecraftSkins/'.$pseudo.'.png';
+
+if(is404($filename)||empty($pseudo)){$filename='http://s3.amazonaws.com/MinecraftSkins/char.png';}
+
+$uniqid=uniqid().'png';
+
+$ch=curl_init($filename);
+$fp=fopen("skin/".$uniqid,'wb');
+curl_setopt($ch,CURLOPT_FILE,$fp);
+curl_setopt($ch,CURLOPT_HEADER,0);
+curl_exec($ch);
+curl_close($ch);
+fclose($fp);
+
+$img_1=imagecreatetruecolor($size,$size);
+$img_2=imagecreatefrompng("skin/".$uniqid);
+imagecopyresampled($img_1,$img_2,0,0,8,8,$size,$size,8,8);
+header('Content-type: image/png');
+imagepng($img_1);
+
+unlink("skin/".$uniqid);
